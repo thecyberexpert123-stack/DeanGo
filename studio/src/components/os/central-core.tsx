@@ -11,9 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import VoiceHUD from './voice-hud';
 import { cn } from '@/lib/utils';
-import { Orbitron } from 'next/font/google';
 
-const orbitron = Orbitron({ subsets: ['latin'] });
 
 type AiStatus = 'listening' | 'thinking' | 'speaking';
 
@@ -314,8 +312,8 @@ const CentralCore = () => {
                 className="absolute inset-0 animate-orbit"
                 style={{
                   ...style,
-                  '--radius': `${130 + i * 2}px`,
-                  '--duration': `${10 + i * 2}s`,
+                  ['--radius' as any]: `${130 + i * 2}px`,
+                  ['--duration' as any]: `${10 + i * 2}s`,
                 }}
               >
                 <div
@@ -337,7 +335,7 @@ const CentralCore = () => {
               <div
                 className={cn(
                   'absolute inset-0 flex items-center justify-center text-primary/90 opacity-100 transition-opacity duration-300 group-hover:opacity-0',
-                  orbitron.className
+                  'font-orbitron'
                 )}
               >
                 <div className="text-4xl font-bold tracking-[0.2em] [text-shadow:0_0_15px_hsl(var(--primary))]">
@@ -355,7 +353,7 @@ const CentralCore = () => {
             key={status}
             className={cn(
               'absolute -bottom-4 animate-fade-in-out text-center text-sm tracking-widest text-accent',
-              orbitron.className
+              'font-orbitron'
             )}
             style={{ animationDuration: `${statusDurations[status]}s` }}
           >

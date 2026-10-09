@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Orbitron } from 'next/font/google';
 import { useVoiceAssistant, type AiStatus } from '@/hooks/use-voice-assistant';
 
-const orbitron = Orbitron({ subsets: ['latin'] });
 
 interface VoiceHUDProps {
   closeDialog: () => void;
@@ -181,14 +179,14 @@ const VoiceHUD = ({ closeDialog }: VoiceHUDProps) => {
           <div className="absolute inset-[32%] rounded-full" style={{ transform: 'translateZ(60px)', transformStyle: 'preserve-3d' }}>
             <div className="absolute inset-0 rounded-full bg-primary/20 animate-breathing-glow" />
             <div className="absolute inset-0 rounded-full border-2 border-primary animate-holographic-flicker" />
-            <div className={cn("absolute inset-0 flex items-center justify-center text-4xl font-bold tracking-[0.2em] text-primary/90 [text-shadow:0_0_15px_hsl(var(--primary))]", orbitron.className)}>
+            <div className={cn("absolute inset-0 flex items-center justify-center text-4xl font-bold tracking-[0.2em] text-primary/90 [text-shadow:0_0_15px_hsl(var(--primary))]", 'font-orbitron')}>
               JARVIS
             </div>
           </div>
 
           <div className="absolute inset-0" style={{ transform: 'translateZ(80px)', transformStyle: 'preserve-3d' }}>
             {particles.slice(60, 70).map((style, i) => (
-              <div key={i} className="absolute inset-0 animate-orbit" style={{ ...style, '--radius': `${130 + i * 2}px`, '--duration': `${10 + i * 2}s` }}>
+              <div key={i} className="absolute inset-0 animate-orbit" style={{ ...style, ['--radius' as any]: `${130 + i * 2}px`, ['--duration' as any]: `${10 + i * 2}s` }}>
                 <div className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-accent" style={{ transform: 'translateX(var(--radius))' }} />
               </div>
             ))}
@@ -197,7 +195,7 @@ const VoiceHUD = ({ closeDialog }: VoiceHUDProps) => {
         </div>
       </div>
       <div 
-        className={cn("absolute -bottom-8 text-center text-accent tracking-widest text-sm animate-fade-in", orbitron.className)}
+        className={cn("absolute -bottom-8 text-center text-accent tracking-widest text-sm animate-fade-in", 'font-orbitron')}
       >
         {status === 'listening' && transcript ? (
             <span className="text-white/80">{transcript}</span>

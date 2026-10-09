@@ -92,3 +92,10 @@
     background-size: 2rem 2rem;
   }
 }
+
+/* Orbitron without next/font — the <link> in layout.tsx loads it into the
+   browser; this class just names it so components don't need next/font (which
+   downloads at build time and fails hard in offline/sandbox environments). */
+.font-orbitron, .font-orbitron * {
+  font-family: 'Orbitron', 'Segoe UI', 'Helvetica Neue', ui-sans-serif, system-ui, sans-serif;
+}

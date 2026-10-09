@@ -20,9 +20,8 @@ const HUD = ({ setMode }: { setMode: (mode: AppMode) => void }) => {
   const boostOverlayClass = cn(
     "fixed inset-0 z-50 pointer-events-none transition-opacity duration-1000",
     {
-      'opacity-0': metrics.boostStatus === 'idle',
       'opacity-100 animate-boost-flash': metrics.boostStatus === 'boosting',
-      'opacity-0': metrics.boostStatus === 'cooling',
+      'opacity-0': metrics.boostStatus !== 'boosting',
     }
   );
 

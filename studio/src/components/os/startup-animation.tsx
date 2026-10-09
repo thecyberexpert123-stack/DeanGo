@@ -1,10 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Orbitron } from 'next/font/google';
 import { useEffect, useState } from 'react';
 
-const orbitron = Orbitron({ subsets: ['latin'] });
 
 // Component for the scrolling system check text
 const SystemLog = ({ lines, startDelay }: { lines: string[]; startDelay: number }) => {
@@ -201,7 +199,7 @@ const StartupAnimation = () => {
         </svg>
       </div>
 
-      <div className={cn("relative z-20 flex h-12 items-center justify-center overflow-hidden", orbitron.className)}>
+      <div className={cn("relative z-20 flex h-12 items-center justify-center overflow-hidden", 'font-orbitron')}>
         <h1 className="text-4xl font-bold tracking-[0.3em] text-transparent animate-boot-text-glitch bg-clip-text bg-gradient-to-r from-accent to-primary opacity-0"
             style={{ textShadow: '0 0 15px hsl(var(--primary)/0.7)' }}>
           JARVIS

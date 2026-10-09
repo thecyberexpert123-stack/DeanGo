@@ -18,7 +18,19 @@ export const useVoiceAssistant = (onClose: () => void) => {
   const [error, setError] = useState('');
   const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
   
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // Cross-browser: SpeechRecognition lives behind vendor prefixes; type it
+  // structurally so plain DOM-lib typing never breaks the build.
+  const recognitionRef = useRef<{
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    onresult: ((event: any) => void) | null;
+    onerror: ((event: any) => void) | null;
+    onend: (() => void) | null;
+    start: () => void;
+    stop: () => void;
+    abort: () => void;
+  } | null>(null);
   const wakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const startListening = useCallback(() => {
@@ -43,12 +55,19 @@ export const useVoiceAssistant = (onClose: () => void) => {
       return;
     }
     if (!recognitionRef.current) {
-        const recognition = new SpeechRecognition();
+        const SRImpl =
+          (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SRImpl) {
+          setError('Speech recognition is not supported in this browser.');
+          setStatus('error');
+          return;
+        }
+        const recognition = new SRImpl();
         recognition.continuous = false;
         recognition.interimResults = true;
         recognition.lang = 'en-US';
 
-        recognition.onresult = (event) => {
+        recognition.onresult = (event: any) => {
             let finalTranscript = '';
             let interimTranscript = '';
             for (let i = 0; i < event.results.length; ++i) {
@@ -80,7 +99,7 @@ export const useVoiceAssistant = (onClose: () => void) => {
             });
         };
 
-        recognition.onerror = (event) => {
+        recognition.onerror = (event: any) => {
             console.error('Speech recognition error', event.error);
             if (event.error === 'no-speech') {
                 // This isn't a fatal error, just close the dialog.
@@ -106,8 +125,15 @@ export const useVoiceAssistant = (onClose: () => void) => {
                 });
                 
                 const audioUri = await textToSpeech(aiResponse);
-                setAudioDataUri(audioUri);
-                setStatus('speaking');
+                if (audioUri) {
+                  setAudioDataUri(audioUri);
+                  setStatus('speaking');
+                } else {
+                  // Genkit not configured — the chat flow already answered in-character;
+                  // voice output simply isn't available.
+                  setError('Voice output unavailable (GOOGLE_API_KEY not configured).');
+                  setStatus('error');
+                }
 
             } catch (err: any) {
                 console.error("Error with AI interaction", err);

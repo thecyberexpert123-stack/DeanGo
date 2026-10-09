@@ -9,6 +9,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { hasGoogleKey, localPerformanceAnalysis } from '@/ai/offline';
 
 const SystemPerformanceInputSchema = z.object({
   cpuUsage: z.number().min(0).max(100).describe('Current CPU usage as a percentage (0-100).'),
@@ -36,6 +37,9 @@ const SystemPerformanceOutputSchema = z.object({
 export type SystemPerformanceOutput = z.infer<typeof SystemPerformanceOutputSchema>;
 
 export async function analyzeSystemPerformance(input: SystemPerformanceInput): Promise<SystemPerformanceOutput> {
+  // No Google key configured → never touch the model; this runs on every HUD
+  // mount and every 60s, so an unconfigured key would spam server errors.
+  if (!hasGoogleKey()) return localPerformanceAnalysis(input);
   return systemPerformanceAnalysisFlow(input);
 }
 

@@ -7,6 +7,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import wav from 'wav';
+import {hasGoogleKey} from '@/ai/offline';
 
 async function toWav(
   pcmData: Buffer,
@@ -69,5 +70,6 @@ const textToSpeechFlow = ai.defineFlow(
 );
 
 export async function textToSpeech(text: string): Promise<string> {
+  if (!hasGoogleKey()) return ''; // no key — degrade to silence instead of throwing
   return textToSpeechFlow(text);
 }

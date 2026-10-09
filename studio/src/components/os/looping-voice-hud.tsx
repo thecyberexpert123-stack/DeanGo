@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Orbitron } from 'next/font/google';
 
-const orbitron = Orbitron({ subsets: ['latin'] });
 
 type AiStatus = 'listening' | 'thinking' | 'speaking';
 
@@ -190,7 +188,7 @@ const LoopingVoiceHUD = () => {
           <div className="absolute inset-[32%] rounded-full" style={{ transform: 'translateZ(60px)', transformStyle: 'preserve-3d' }}>
             <div className="absolute inset-0 rounded-full bg-primary/20 animate-breathing-glow [animation-duration:3s]" />
             <div className="absolute inset-0 rounded-full border-2 border-primary animate-holographic-flicker" />
-            <div className={cn("absolute inset-0 flex items-center justify-center text-4xl font-bold tracking-[0.2em] text-primary/90 [text-shadow:0_0_15px_hsl(var(--primary))]", orbitron.className)}>
+            <div className={cn("absolute inset-0 flex items-center justify-center text-4xl font-bold tracking-[0.2em] text-primary/90 [text-shadow:0_0_15px_hsl(var(--primary))]", 'font-orbitron')}>
               JARVIS
             </div>
           </div>
@@ -200,8 +198,8 @@ const LoopingVoiceHUD = () => {
             {particles.slice(70, 85).map((style, i) => (
               <div key={`orbit-a-${i}`} className="absolute inset-0 animate-orbit" style={{ 
                   ...style, 
-                  '--radius': `${180 + i * 4}px`, 
-                  '--duration': `${10 + i * 2}s`,
+                  ['--radius' as any]: `${180 + i * 4}px`, 
+                  ['--duration' as any]: `${10 + i * 2}s`,
                   transform: 'translateZ(80px)' 
               }}>
                   <div className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-accent" style={{ transform: 'translateX(var(--radius))' }} />
@@ -210,8 +208,8 @@ const LoopingVoiceHUD = () => {
             {particles.slice(85, 100).map((style, i) => (
               <div key={`orbit-b-${i}`} className="absolute inset-0 animate-orbit" style={{ 
                   ...style, 
-                  '--radius': `${190 + i * 3}px`, 
-                  '--duration': `${12 + i * 2.5}s`,
+                  ['--radius' as any]: `${190 + i * 3}px`, 
+                  ['--duration' as any]: `${12 + i * 2.5}s`,
                   animationDirection: 'reverse',
                   transform: 'rotateX(90deg) translateZ(10px)' 
               }}>
@@ -221,8 +219,8 @@ const LoopingVoiceHUD = () => {
             {particles.slice(100, 115).map((style, i) => (
               <div key={`orbit-c-${i}`} className="absolute inset-0 animate-orbit" style={{ 
                   ...style, 
-                  '--radius': `${200 + i * 2}px`, 
-                  '--duration': `${15 + i * 2}s`,
+                  ['--radius' as any]: `${200 + i * 2}px`, 
+                  ['--duration' as any]: `${15 + i * 2}s`,
                   transform: 'rotateY(60deg) rotateX(-20deg) translateZ(-20px)' 
               }}>
                   <div className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full bg-accent/70 blur-[1px]" style={{ transform: 'translateX(var(--radius))' }} />
@@ -234,7 +232,7 @@ const LoopingVoiceHUD = () => {
       </div>
       <div 
         key={status} 
-        className={cn("absolute -bottom-4 text-center text-accent tracking-widest text-sm animate-fade-in-out", orbitron.className)}
+        className={cn("absolute -bottom-4 text-center text-accent tracking-widest text-sm animate-fade-in-out", 'font-orbitron')}
         style={{ animationDuration: `${statusDurations[status]}s` }}
       >
         {statusText[status]}
