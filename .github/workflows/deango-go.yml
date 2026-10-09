@@ -7,6 +7,9 @@ on:
       - '.github/workflows/deango-go.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write # required for the gofmt auto-fix push-back
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,13 +21,24 @@ jobs:
           go-version: '1.22'
           cache: false
 
+      - name: gofmt auto-fix (pushes formatting commit if needed)
+        run: |
+          cd deango-go
+          gofmt -w .
+          if ! git diff --quiet -- deango-go; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add deango-go
+            git commit -m "gofmt: auto-format deango-go (CI)"
+            git push origin "HEAD:${{ github.ref_name }}"
+            echo "pushed formatting commit"
+          else
+            echo "already formatted"
+          fi
+
       - name: gofmt check
         working-directory: deango-go
-        run: |
-          gofmt -d . | tee /tmp/gofmt.diff
-          if [ -s /tmp/gofmt.diff ]; then
-            echo "::error::gofmt issues (see diff above)"; exit 1
-          fi
+        run: test -z "$(gofmt -l .)"
 
       - name: go vet
         working-directory: deango-go
@@ -40,8 +54,17 @@ jobs:
           go build -o /tmp/deango ./cmd/deango
           /tmp/deango version | tee /tmp/version.json
           /tmp/deango detect > /tmp/detect.json
-          grep -q '"ok"' /tmp/version.json || grep -q '"go"' /tmp/version.json
+          grep -q '"go"' /tmp/version.json
           grep -q '"scannedAt"' /tmp/detect.json
+
+      - name: e2e — Go binary speaks ACP to the mock agent
+        run: |
+          set -e
+          out="$(/tmp/deango probe --cmd "python3 bridge/tests/mock_acp_agent.py" --prompt "ci e2e" --list)"
+          echo "$out"
+          echo "$out" | grep -q '"ok": true'
+          echo "$out" | grep -q '"sessionFork": true'
+          echo "$out" | grep -q '"stopReason": "end_turn"'
 
       - name: cross-compile (linux/windows/darwin × amd64/arm64)
         working-directory: deango-go
