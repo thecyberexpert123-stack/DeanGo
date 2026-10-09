@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from 'react';
  * randomness is particle geometry, generated client-side post-mount.
  */
 
-const TOTAL_MS = 8000;
+const TOTAL_MS = 10_000; // one master clock drives every animation
 
 const PHASES = [
   { at: 0, code: 'PHASE 01', label: 'BOOTSTRAP SEQUENCE' },
@@ -220,24 +220,24 @@ const StartupAnimation = () => {
             </g>
 
             {/* flowing segment rings (counter-rotating dash streams) */}
-            <g transform="translate(200 200)" className="animate-[spin_18s_linear_infinite]" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-              <circle r="150" stroke="hsl(var(--primary)/0.4)" strokeWidth="1" strokeDasharray="30 20" className="animate-ring-dash-flow" />
+            <g className="animate-[spin_18s_linear_infinite]" style={{ transformOrigin: '200px 200px' }}>
+              <circle cx="200" cy="200" r="150" stroke="hsl(var(--primary)/0.4)" strokeWidth="1" strokeDasharray="30 20" className="animate-ring-dash-flow" />
             </g>
-            <g transform="translate(200 200)" className="animate-[spin_26s_linear_infinite_reverse]" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-              <circle r="138" stroke="hsl(var(--accent)/0.35)" strokeWidth="0.75" strokeDasharray="8 14" />
+            <g className="animate-[spin_26s_linear_infinite_reverse]" style={{ transformOrigin: '200px 200px' }}>
+              <circle cx="200" cy="200" r="138" stroke="hsl(var(--accent)/0.35)" strokeWidth="0.75" strokeDasharray="8 14" />
             </g>
 
             {/* orbiting satellites */}
             {progress >= 20 && (
-              <g transform="translate(200 200)" className="animate-[spin_7s_linear_infinite]" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-                <circle cx="150" cy="0" r="2.5" fill="hsl(var(--accent))" />
-                <circle cx="-150" cy="0" r="1.5" fill="hsl(var(--primary)/0.7)" />
+              <g className="animate-[spin_7s_linear_infinite]" style={{ transformOrigin: '200px 200px' }}>
+                <circle cx="350" cy="200" r="2.5" fill="hsl(var(--accent))" />
+                <circle cx="50" cy="200" r="1.5" fill="hsl(var(--primary)/0.7)" />
               </g>
             )}
             {progress >= 45 && (
-              <g transform="translate(200 200)" className="animate-[spin_10s_linear_infinite_reverse]" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-                <circle cx="0" cy="-138" r="2" fill="hsl(var(--primary))" />
-                <circle cx="0" cy="138" r="1.2" fill="hsl(var(--accent)/0.8)" />
+              <g className="animate-[spin_10s_linear_infinite_reverse]" style={{ transformOrigin: '200px 200px' }}>
+                <circle cx="200" cy="62" r="2" fill="hsl(var(--primary))" />
+                <circle cx="200" cy="338" r="1.2" fill="hsl(var(--accent)/0.8)" />
               </g>
             )}
 
@@ -253,7 +253,7 @@ const StartupAnimation = () => {
                 <path
                   key={i}
                   transform={`rotate(${i * 60} 200 200)`}
-                  d="M 200 80 L 200 50 M 200 80 L 200 350"
+                  d="M 200 80 L 200 50 M 200 80 L 200 200"
                   strokeWidth="0.75"
                   stroke="hsl(var(--primary)/0.5)"
                 />
