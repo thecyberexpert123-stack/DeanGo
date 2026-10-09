@@ -1,0 +1,136 @@
+{
+  "id": "deango-hands",
+  "categories": ["agent-runtimes"],
+  "name": "DeanGo HANDS (Hermes brain)",
+  "description": "First-class Hermes Agent backend for OpenClaw. Hermes is the body+brain (turn loop, memory, skills, learning); OpenClaw remains the nerves+limbs (channels, devices, approvals, artifacts). Spinal cord: ACP v1 over stdio.",
+  "enabledByDefault": true,
+  "activation": {
+    "onStartup": true
+  },
+  "backupResources": [
+    {
+      "disposition": "regenerable",
+      "scope": "state",
+      "relativePath": "deango-hands/session-bindings.json"
+    }
+  ],
+  "doctorContract": {
+    "configRepair": true,
+    "stateMigrations": [
+      {
+        "id": "deango-hands-bindings-v1",
+        "doctorOnly": true,
+        "phase": "after-session-repair"
+      }
+    ]
+  },
+  "configGroups": [
+    {
+      "id": "brain",
+      "title": "Hermes brain",
+      "order": 10,
+      "properties": ["command", "args", "env", "cwd", "timeoutSeconds"]
+    },
+    {
+      "id": "protocol",
+      "title": "ACProtocol behavior",
+      "order": 20,
+      "properties": ["permissionMode", "nonInteractivePermissions", "sessionResume", "provenance"]
+    },
+    {
+      "id": "hands",
+      "title": "Hands (MCP tool injection)",
+      "order": 30,
+      "properties": ["mcpServers"]
+    }
+  ],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "command": {
+        "type": "string",
+        "minLength": 1,
+        "default": "hermes acp"
+      },
+      "args": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": []
+      },
+      "env": {
+        "type": "object",
+        "additionalProperties": { "type": "string" }
+      },
+      "cwd": {
+        "type": "string",
+        "minLength": 1
+      },
+      "timeoutSeconds": {
+        "type": "number",
+        "minimum": 1,
+        "default": 120
+      },
+      "permissionMode": {
+        "type": "string",
+        "enum": ["approve-all", "approve-reads", "deny-all"],
+        "default": "approve-reads"
+      },
+      "nonInteractivePermissions": {
+        "type": "string",
+        "enum": ["deny", "fail"],
+        "default": "deny"
+      },
+      "sessionResume": {
+        "type": "boolean",
+        "default": true,
+        "description": "Reattach existing Hermes sessions across gateway restarts (the body outlives the spine)."
+      },
+      "provenance": {
+        "type": "boolean",
+        "default": true,
+        "description": "Pass OpenClaw session/surface metadata into Hermes as ACP _meta so the brain knows which leg it is speaking through."
+      },
+      "mcpServers": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "command": { "type": "string" },
+            "args": { "type": "array", "items": { "type": "string" } },
+            "env": { "type": "object", "additionalProperties": { "type": "string" } },
+            "url": { "type": "string" },
+            "type": { "type": "string", "enum": ["stdio", "http", "sse"] }
+          }
+        },
+        "description": "ACP-level MCP servers (the hands) injected into every Hermes session. Stable across OpenClaw updates because injection is an ACP v1 feature, not an OpenClaw internal."
+      }
+    }
+  },
+  "configContracts": {
+    "dangerousFlags": [{ "path": "permissionMode", "equals": "approve-all" }],
+    "secretInputs": {
+      "bundledDefaultEnabled": false,
+      "paths": [{ "path": "env.*", "expected": "string" }, { "path": "mcpServers.*.env.*", "expected": "string" }]
+    }
+  },
+  "uiHints": {
+    "command": {
+      "label": "Brain command",
+      "help": "Command that starts the Hermes ACP agent (stdio). Use DeanGo's launcher for stdio hygiene (deango connect renders it)."
+    },
+    "sessionResume": {
+      "label": "Session resume",
+      "help": "Keeps the organism's memory continuous: reattach Hermes bodies after restarts/updates instead of starting blank."
+    },
+    "provenance": {
+      "label": "Leg provenance",
+      "help": "Tells the brain which surface (whatsapp/telegram/ui…) and pairing identity each prompt walked in on."
+    },
+    "mcpServers": {
+      "label": "Hands (MCP servers)",
+      "help": "Tools the brain may call mid-turn — OpenClaw core/plugin tools, exposed over MCP."
+    }
+  }
+}

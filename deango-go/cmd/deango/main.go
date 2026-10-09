@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"deango/internal/acp"
+	"deango/internal/compat"
 	"deango/internal/connect"
 	"deango/internal/detect"
 	"deango/internal/inspect"
@@ -162,6 +163,17 @@ func main() {
 		}
 		util.PrintJSON(map[string]any{"id": id, "log": supervisor.TailLog(id, lines)})
 
+	case "compat":
+		timeout, err := time.ParseDuration(opt(args, "--timeout", "60s"))
+		if err != nil {
+			timeout = 60 * time.Second
+		}
+		rep, err := compat.Check(flag(args, "--heal"), opt(args, "--cmd", ""), timeout)
+		if err != nil {
+			fatal(err)
+		}
+		util.PrintJSON(rep)
+
 	case "probe":
 		timeout, err := time.ParseDuration(opt(args, "--timeout", "90s"))
 		if err != nil {
@@ -209,7 +221,7 @@ func main() {
 	default:
 		raw, _ := json.Marshal(map[string]any{
 			"error": "unknown command: " + cmd,
-			"usage": exeName() + " detect|inspect|doctor|connect [--apply]|setup [--confirm] [step]|up|down|status|logs [unit]|probe [--cmd X --prompt ...]",
+			"usage": exeName() + " detect|inspect|doctor|connect [--apply]|setup [--confirm] [step]|up|down|status|logs [unit]|probe [--cmd X --prompt ...]|compat [--heal --cmd X --timeout D]",
 		})
 		fmt.Println(string(raw))
 		os.Exit(1)

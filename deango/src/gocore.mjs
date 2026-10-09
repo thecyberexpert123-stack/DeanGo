@@ -99,6 +99,16 @@ export async function tailLog(id, lines = 200) {
   if (useGo()) return (await go(["logs", id, "--lines", String(lines)])).log;
   return nTailLog(id, lines);
 }
+export async function checkCompat({ heal = false, agentCmd = null, timeoutMs = 60000 } = {}) {
+  if (useGo()) {
+    const args = ["compat", "--timeout", `${Math.round(timeoutMs / 1000)}s`];
+    if (heal) args.push("--heal");
+    if (agentCmd) args.push("--cmd", agentCmd);
+    return await go(args, { timeoutMs: timeoutMs + 30000 });
+  }
+  const { checkCompat } = await import("./compat.mjs");
+  return checkCompat({ heal, agentCmd, timeoutMs });
+}
 export async function probeAcp(agentCmd, { prompt = null, listSessions = false, permissionPolicy = "deny", timeoutMs = 90000 } = {}) {
   if (useGo()) {
     const args = ["probe", "--cmd", agentCmd, "--timeout", `${Math.round(timeoutMs / 1000)}s`];

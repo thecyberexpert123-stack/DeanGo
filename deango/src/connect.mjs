@@ -74,6 +74,44 @@ quiet_mode: true
       },
     ],
   }),
+
+  organism: (opts, det) => ({
+    assignedBy: "deango",
+    roles: {
+      brain: {
+        engine: "hermes",
+        command: opts.launcherPath,
+        home: det.hermes.home || null,
+        checkout: det.hermes.checkout || null,
+        owns: ["turn loop", "memory", "skills", "learning", "persona (SOUL.md)", "session bodies"],
+      },
+      limbs: {
+        engine: "openclaw",
+        home: det.openclaw.home || null,
+        npmGlobal: det.openclaw.npmGlobal || null,
+        checkout: det.openclaw.checkout || null,
+        owns: ["channels", "devices/nodes", "apps", "approvals relay", "artifacts custody", "delivery ledger"],
+      },
+      hands: {
+        mechanism: "acpx MCP bridges",
+        bridges: ["openClawToolsMcpBridge", "pluginToolsMcpBridge"],
+        callableBy: "brain",
+      },
+      legs: {
+        note: "Channels are configured inside OpenClaw; DeanGo does not reassign transport, it records it.",
+      },
+    },
+    contract: {
+      spine: "acp/v1 (the only volatile seam, by design)",
+      stableSurfaces: [
+        "openclaw/plugin-sdk/* (plugin contract, minHostVersion-pinned)",
+        "openclaw.plugin.json manifest + doctor contracts",
+        "hermes acp_adapter (ACP agent)",
+        "managed config blocks (idempotent upsert)",
+      ],
+      healPolicy: "on version/location drift or failed spine probe → deango compat --heal (re-render, re-probe)",
+    },
+  }),
 };
 
 /** Plan the connection: pure render, no writes. */
@@ -94,6 +132,7 @@ export function planConnection(det) {
       { path: path.join(DEANGO_HOME, "openclaw", "acpx.hermes.config.json"), kind: "openclaw-snippet", content: JSON.stringify(TEMPLATES.acpx(opts), null, 2) + "\n" },
       { path: path.join(DEANGO_HOME, "hermes", "cli-config.deango.yaml"), kind: "hermes-snippet", content: TEMPLATES.hermesConfig() },
       { path: path.join(DEANGO_HOME, "connection", "units.json"), kind: "units", content: JSON.stringify(TEMPLATES.units(opts), null, 2) + "\n" },
+      { path: path.join(DEANGO_HOME, "connection", "organism.json"), kind: "organism", content: JSON.stringify(TEMPLATES.organism(opts, det), null, 2) + "\n" },
     ],
     mergeTargets: {
       openclawConfig: o.configFiles?.find((f) => f.endsWith(".json")) || null,
@@ -141,6 +180,18 @@ export async function buildConnection(det, { apply = false } = {}) {
 
   const manifest = {
     builtAt: new Date().toISOString(), apply, written, merges,
+    core: "node",
+    // Ground truth for deango compat's drift detection: versions + locations at connect time.
+    versions: {
+      hermes: det.hermes.version || null,
+      openclaw: det.openclaw.version || null,
+      hermesHome: det.hermes.home || null,
+      hermesCheckout: det.hermes.checkout || null,
+      hermesBins: (det.hermes.bins || []).map((b) => b.name + "=" + b.path),
+      openclawHome: det.openclaw.home || null,
+      openclawNpmGlobal: det.openclaw.npmGlobal || null,
+      openclawBin: det.openclaw.bins?.[0]?.path || null,
+    },
     detectionSnapshot: { hermes: plan.warnings.length ? det.hermes.installed : true, openclaw: det.openclaw.installed },
   };
   await writeJson(path.join(DEANGO_HOME, "connection", "manifest.json"), manifest);

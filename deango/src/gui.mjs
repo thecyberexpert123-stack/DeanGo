@@ -7,7 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { detectAll, inspectAll, planConnection, buildConnection, planSetup, runStep,
-         listUnits, startUnit, stopUnit, tailLog, probeAcp, coreInfo } from "./gocore.mjs";
+         listUnits, startUnit, stopUnit, tailLog, probeAcp, coreInfo, checkCompat } from "./gocore.mjs";
 import { readJson, DEANGO_HOME, log } from "./util.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,6 +52,9 @@ const routes = {
   "POST /api/unit/start": async (body) => await startUnit(body.id),
   "POST /api/unit/stop": async (body) => await stopUnit(body.id),
   "GET /api/unit/log": async (body, query) => ({ log: tailLog(query.id, Number(query.lines || 200)) }),
+  "GET /api/health": async () => await readJson(path.join(DEANGO_HOME, "connection", "health.json")),
+  "POST /api/compat": async (body) =>
+    await checkCompat({ heal: body.heal === true, agentCmd: body.cmd || null, timeoutMs: Number(body.timeoutMs || 60000) }),
   "POST /api/acp/probe": async (body) => {
     const cmd = body.cmd || "hermes acp";
     return await probeAcp(cmd, {

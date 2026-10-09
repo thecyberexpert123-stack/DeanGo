@@ -44,14 +44,15 @@ input[type=text]{background:#0a0e13;border:1px solid var(--line);color:var(--txt
 <main id="view">…</main>
 <div id="flash" class="flash"></div>
 <script>
-const S={det:null,insp:null,units:[],tab:"Overview",manifest:null};
-const TABS=["Overview","Detection","Inspection","Connection","Units","Probe","Setup"];
+const S={det:null,insp:null,units:[],tab:"Overview",manifest:null,health:null};
+const TABS=["Overview","Detection","Inspection","Connection","Units","Probe","Watchdog","Setup"];
 const flash=(m)=>{const f=document.getElementById("flash");f.textContent=m;f.classList.add("show");setTimeout(()=>f.classList.remove("show"),3500)};
 const j=(p,o={})=>fetch("/api/"+p,{method:o.m||(o.b?"POST":"GET"),headers:{"content-type":"application/json"},body:o.b?JSON.stringify(o.b):undefined}).then(r=>r.json());
 const esc=(s)=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
 function tabs(){document.getElementById("tabs").innerHTML=TABS.map(t=>`<button class="${t===S.tab?"on":""}" onclick="S.tab='${t}';render()">${t}</button>`).join("")}
 async function refresh(){const st=await j("status");S.det=st.det;S.units=st.units||[];S.manifest=st.manifest;
+  S.health=await j("health").catch(()=>null)||S.health;
   const eb=document.getElementById("engineBadge");
   const mode=st.engine?.mode||"unknown";
   eb.textContent="engine: "+mode;
@@ -112,7 +113,20 @@ function vProbe(){return `<div class="card"><h3>Live ACP probe — feel the spin
  <pre id="pout">…</pre></div>`}
 function vSetup(){return `<div class="row"><button class="act" onclick="setupPlan()">plan setup</button></div>
  <p style="color:var(--dim)">Missing bodies? DeanGo drafts the official install commands. Nothing runs until you click run."</p><pre id="setout">…</pre>`}
-const VIEWS={Overview:vOverview,Detection:vDetection,Inspection:vInspection,Connection:vConnection,Units:vUnits,Probe:vProbe,Setup:vSetup};
+function vCompat(){const h=S.health;
+ return `<div class="card"><h3>🩺 Update watchdog — does the organism still have a spine?</h3>
+ <p style="color:var(--dim)">When either body self-updates, DeanGo diffs versions/locations against the connection manifest
+ and re-probes the live ACP spine. <b>Heal</b> re-renders every connection file against the updated installs
+ and snaps binding checkpoints to the new state — without ever upgrading privilege merges silently.</p>
+ ${h?`<div class="kv"><b>healthy</b><span class="mono" style="color:${h.healthy?"var(--ok)":"var(--bad)"}">${h.healthy}</span>
+ <b>drift fields</b><span class="mono">${h.driftCount}${h.drift?.length?" — "+h.drift.map(d=>esc(d.field)).join(", "):""}</span>
+ <b>spine probe</b><span class="mono">${h.probe?.ok?"ok":"FAILED"} · ${h.probe?.ms}ms · ${esc(h.probe?.cmd||"")}</span>
+ <b>healed</b><span class="mono">${h.healed}${h.probeAfterHeal?" → "+(h.probeAfterHeal.ok?"ok":"still broken"):""}</span>
+ <b>checked at</b><span class="mono">${esc(h.checkedAt||"—")}</span></div>`:"<p style='color:var(--dim)'>No report yet.</p>"}
+ <div class="row" style="margin-top:10px"><button class="act" onclick="runCompat(false)">🩺 check</button>
+ <button class="ghost" onclick="runCompat(true)">♻ check + heal</button></div>
+ <pre id="cout">${h?esc(JSON.stringify(h,null,2)):"press check — the watchdog re-verifies the whole connection"}</pre></div>`}
+const VIEWS={Overview:vOverview,Detection:vDetection,Inspection:vInspection,Connection:vConnection,Units:vUnits,Probe:vProbe,Watchdog:vCompat,Setup:vSetup};
 
 async function render(){tabs();document.getElementById("view").innerHTML=VIEWS[S.tab]();
  if(S.tab==="Inspection"){const r=await j("report");document.getElementById("insp").textContent=JSON.stringify(r.insp,null,2)}}
@@ -122,6 +136,9 @@ async function build(apply){const r=await j("connection/build",{b:{apply}});if(S
  flash(apply?`built + ${r.merges?.length||0} merge(s) applied`:`connection files written to ${S.det?.system?.deangoHome||"~/.deango"}`);await refresh()}
 async function unitAct(a,id){const r=await j("unit/"+a,{b:{id}});flash(JSON.stringify(r).slice(0,200));await refresh()}
 async function loadLog(id){const r=await j("unit/log?id="+id+"&lines=120");document.getElementById("log-"+id).textContent=r.log||"(empty)"}
+async function runCompat(heal){if(document.getElementById("cout"))document.getElementById("cout").textContent=(heal?"checking + healing":"checking")+"… (spine probe can take a few seconds)";
+ const r=await j("compat",{b:{heal}});S.health=r;render();
+ flash(r.healthy?"organism healthy ✔":r.healed?"heal ran — spine still failing (see report)":"drift/spine issue — try check + heal")}
 async function runProbe(){document.getElementById("pout").textContent="probing…";
  const r=await j("acp/probe",{b:{cmd:document.getElementById("pcmd").value,prompt:document.getElementById("pprompt").value||null,
  listSessions:document.getElementById("plist").checked,permissionPolicy:document.getElementById("pallow").checked?"allow-once":"deny"}});

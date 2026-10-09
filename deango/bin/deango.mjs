@@ -12,11 +12,13 @@
  *   deango logs <unit> [lines]
  *   deango probe [--cmd X] [--prompt "..."] [--list] [--allow-once]
  *                                 live ACP handshake with the brain
+ *   deango compat [--heal] [--cmd X]
+ *                                 update watchdog: drift diff + spine probe (+ self-heal)
  *   deango gui [--port 7788]      web console (default command)
  *   deango doctor                 detect → inspect → connect(plan) → report
  */
 import { detectAll, inspectAll, planConnection, buildConnection, planSetup, runStep,
-         listUnits, startUnit, stopUnit, tailLog, probeAcp, coreInfo } from "../src/gocore.mjs";
+         listUnits, startUnit, stopUnit, tailLog, probeAcp, coreInfo, checkCompat } from "../src/gocore.mjs";
 import { startGui } from "../src/gui.mjs";
 import { log } from "../src/util.mjs";
 
@@ -30,6 +32,8 @@ async function main() {
   switch (cmd) {
     case "core":
       out(await coreInfo()); break;
+    case "compat":
+      out(await checkCompat({ heal: flag("--heal"), agentCmd: opt("--cmd", null) })); break;
     case "detect":
       out(await detectAll()); break;
     case "inspect": {

@@ -1,0 +1,21 @@
+{
+  "name": "@deango/hands",
+  "version": "0.1.0",
+  "description": "DeanGo HANDS — first-class Hermes brain for OpenClaw. Registers the 'hermes' ACP runtime backend so Hermes Agent (brain+body) drives OpenClaw (nerves+limbs). Update-resilient: uses only openclaw/plugin-sdk contracted surfaces.",
+  "license": "MIT",
+  "type": "module",
+  "openclaw": {
+    "extensions": ["./register.runtime.ts"],
+    "install": {
+      "npmSpec": "@deango/hands",
+      "defaultChoice": "npm",
+      "minHostVersion": ">=2026.4.25"
+    }
+  },
+  "peerDependencies": {
+    "@openclaw/plugin-sdk": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
