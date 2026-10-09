@@ -287,7 +287,27 @@ export default {
         'gyro-3': {
           from: { transform: 'rotateX(-50deg) rotateY(20deg) rotateZ(0deg)'},
           to: { transform: 'rotateX(-50deg) rotateY(20deg) rotateZ(720deg)'}
-        }
+        },
+        'boot-grid-pan': {
+          from: { backgroundPosition: '0 0, 0 0' },
+          to: { backgroundPosition: '288px 288px, 72px 72px' },
+        },
+        'eq-bar': {
+          '0%, 100%': { transform: 'scaleY(0.25)' },
+          '50%': { transform: 'scaleY(1)' },
+        },
+        'granted-in': {
+          '0%': { opacity: '0', transform: 'scale(1.35)', letterSpacing: '0.7em', filter: 'blur(6px)' },
+          '60%': { opacity: '1', transform: 'scale(0.98)', filter: 'blur(0)' },
+          '100%': { opacity: '1', transform: 'scale(1)', letterSpacing: '0.4em' },
+        },
+        'ring-dash-flow': {
+          to: { strokeDashoffset: '-30' },
+        },
+        'cargo-dot': {
+          '0%, 100%': { boxShadow: '0 0 0 0 hsl(var(--primary) / 0.5)' },
+          '50%': { boxShadow: '0 0 12px 3px hsl(var(--primary) / 0.7)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -335,6 +355,19 @@ export default {
         'gyro-1': 'gyro-1 4s 2.5s ease-in-out forwards',
         'gyro-2': 'gyro-2 4s 2.8s ease-in-out forwards',
         'gyro-3': 'gyro-3 4s 3s ease-in-out forwards',
+        // Boot v2 — delay-free variants triggered by boot-progress state
+        'boot-core-ignite-now': 'boot-core-ignite 900ms cubic-bezier(0.2, 0.9, 0.25, 1.2) forwards',
+        'boot-shockwave-1-now': 'boot-shockwave-1 1.1s ease-out forwards',
+        'boot-shockwave-2-now': 'boot-shockwave-2 1.3s ease-out forwards',
+        'boot-burst-now': 'particle-burst 1s ease-out forwards',
+        'boot-grid-pan': 'boot-grid-pan 14s linear infinite',
+        'eq-bar': 'eq-bar 1.1s ease-in-out infinite',
+        'granted-in': 'granted-in 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'boot-text-glitch-now': 'boot-text-glitch 1.2s ease-out forwards',
+        'ring-dash-flow': 'ring-dash-flow 3s linear infinite',
+        'cargo-dot': 'cargo-dot 2.2s ease-in-out infinite',
+        'boot-screen-shake-now': 'boot-screen-shake 0.3s cubic-bezier(.36,.07,.19,.97) both',
+        'boot-core-pulse-now': 'boot-core-pulse 2s ease-in-out infinite',
       },
     },
   },
