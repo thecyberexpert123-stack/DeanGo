@@ -51,7 +51,7 @@ const routes = {
   "GET /api/units": async () => await listUnits(),
   "POST /api/unit/start": async (body) => await startUnit(body.id),
   "POST /api/unit/stop": async (body) => await stopUnit(body.id),
-  "GET /api/unit/log": async (body, query) => ({ log: tailLog(query.id, Number(query.lines || 200)) }),
+  "GET /api/unit/log": async (body, query) => ({ log: await tailLog(query.id, Number(query.lines || 200)) }),
   "GET /api/health": async () => await readJson(path.join(DEANGO_HOME, "connection", "health.json")),
   "POST /api/compat": async (body) =>
     await checkCompat({ heal: body.heal === true, agentCmd: body.cmd || null, timeoutMs: Number(body.timeoutMs || 60000) }),
