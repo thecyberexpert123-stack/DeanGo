@@ -1,0 +1,5 @@
+# DeanGo Go core build outputs (compiled via CI or locally — never committed)
+deango-go/deango
+deango-go/deango.exe
+deango-go/dist/
+node_modules/

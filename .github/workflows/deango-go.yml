@@ -1,0 +1,62 @@
+name: deango-go
+
+on:
+  push:
+    paths:
+      - 'deango-go/**'
+      - '.github/workflows/deango-go.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: false
+
+      - name: gofmt check
+        working-directory: deango-go
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "::error::gofmt issues in:"; gofmt -l .; exit 1
+          fi
+
+      - name: go vet
+        working-directory: deango-go
+        run: go vet ./...
+
+      - name: build (host)
+        working-directory: deango-go
+        run: go build ./...
+
+      - name: smoke test — CLI JSON contract
+        working-directory: deango-go
+        run: |
+          go build -o /tmp/deango ./cmd/deango
+          /tmp/deango version | tee /tmp/version.json
+          /tmp/deango detect > /tmp/detect.json
+          grep -q '"ok"' /tmp/version.json || grep -q '"go"' /tmp/version.json
+          grep -q '"scannedAt"' /tmp/detect.json
+
+      - name: cross-compile (linux/windows/darwin × amd64/arm64)
+        working-directory: deango-go
+        run: |
+          set -e
+          for target in "linux amd64" "linux arm64" "darwin amd64" "darwin arm64" "windows amd64"; do
+            set -- $target
+            out="dist/deango-$1-$2"
+            [ "$1" = "windows" ] && out="$out.exe"
+            echo "building $out"
+            GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o "$out" ./cmd/deango
+          done
+          ls -la dist/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deango-binaries
+          path: deango-go/dist/
+          retention-days: 30
