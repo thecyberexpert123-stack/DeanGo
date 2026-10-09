@@ -23,8 +23,7 @@ jobs:
 
       - name: gofmt auto-fix (pushes formatting commit if needed)
         run: |
-          cd deango-go
-          gofmt -w .
+          gofmt -w deango-go
           if ! git diff --quiet -- deango-go; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
