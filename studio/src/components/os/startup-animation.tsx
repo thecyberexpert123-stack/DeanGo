@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from 'react';
  * randomness is particle geometry, generated client-side post-mount.
  */
 
-const TOTAL_MS = 10_000; // one master clock drives every animation
+const TOTAL_MS = 15_000; // one master clock drives every animation
 
 const PHASES = [
   { at: 0, code: 'PHASE 01', label: 'BOOTSTRAP SEQUENCE' },
@@ -231,13 +231,13 @@ const StartupAnimation = () => {
             {progress >= 20 && (
               <g className="animate-[spin_7s_linear_infinite]" style={{ transformOrigin: '200px 200px' }}>
                 <circle cx="350" cy="200" r="2.5" fill="hsl(var(--accent))" />
-                <circle cx="50" cy="200" r="1.5" fill="hsl(var(--primary)/0.7)" />
+                <circle cx="50" cy="200" r="2.5" fill="hsl(var(--accent))" />
               </g>
             )}
             {progress >= 45 && (
               <g className="animate-[spin_10s_linear_infinite_reverse]" style={{ transformOrigin: '200px 200px' }}>
-                <circle cx="200" cy="62" r="2" fill="hsl(var(--primary))" />
-                <circle cx="200" cy="338" r="1.2" fill="hsl(var(--accent)/0.8)" />
+                <circle cx="200" cy="62" r="2.5" fill="hsl(var(--primary))" />
+                <circle cx="200" cy="338" r="2.5" fill="hsl(var(--primary))" />
               </g>
             )}
 
