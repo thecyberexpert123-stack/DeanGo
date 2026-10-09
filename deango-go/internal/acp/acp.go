@@ -39,18 +39,18 @@ type pendingCall struct {
 
 // Client owns the child agent process and correlates requests.
 type Client struct {
-	proc            *exec.Cmd
-	stdin           io.WriteCloser
-	mu              sync.Mutex // serializes writes + id allocation
-	nextID          int
-	pendingMu       sync.Mutex
-	pending         map[string]pendingCall
-	notifyMu        sync.Mutex
-	notifyHandlers  []func(method string, params json.RawMessage)
+	proc             *exec.Cmd
+	stdin            io.WriteCloser
+	mu               sync.Mutex // serializes writes + id allocation
+	nextID           int
+	pendingMu        sync.Mutex
+	pending          map[string]pendingCall
+	notifyMu         sync.Mutex
+	notifyHandlers   []func(method string, params json.RawMessage)
 	permissionPolicy string
-	dead            error
-	agentLog        []string
-	done            chan struct{}
+	dead             error
+	agentLog         []string
+	done             chan struct{}
 }
 
 // NewClient spawns the agent command and starts the read loop.

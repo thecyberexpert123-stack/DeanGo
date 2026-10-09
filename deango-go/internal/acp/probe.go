@@ -18,18 +18,18 @@ type ProbeOptions struct {
 
 // ProbeResult mirrors the Node probe result shape so the GUI is core-agnostic.
 type ProbeResult struct {
-	OK           bool              `json:"ok"`
-	Error        string            `json:"error,omitempty"`
-	Initialize   json.RawMessage   `json:"initialize,omitempty"`
-	Capabilities map[string]any    `json:"capabilities,omitempty"`
-	SessionID    string            `json:"sessionId,omitempty"`
-	Sessions     any               `json:"sessions"`
-	Models       json.RawMessage   `json:"models,omitempty"`
-	Modes        json.RawMessage   `json:"modes,omitempty"`
-	StreamedText string            `json:"streamedText"`
-	StopReason   string            `json:"stopReason,omitempty"`
-	PromptError  string            `json:"promptError,omitempty"`
-	AgentLogTail []string          `json:"agentLogTail,omitempty"`
+	OK           bool            `json:"ok"`
+	Error        string          `json:"error,omitempty"`
+	Initialize   json.RawMessage `json:"initialize,omitempty"`
+	Capabilities map[string]any  `json:"capabilities,omitempty"`
+	SessionID    string          `json:"sessionId,omitempty"`
+	Sessions     any             `json:"sessions"`
+	Models       json.RawMessage `json:"models,omitempty"`
+	Modes        json.RawMessage `json:"modes,omitempty"`
+	StreamedText string          `json:"streamedText"`
+	StopReason   string          `json:"stopReason,omitempty"`
+	PromptError  string          `json:"promptError,omitempty"`
+	AgentLogTail []string        `json:"agentLogTail,omitempty"`
 }
 
 type updateParams struct {
@@ -70,9 +70,9 @@ func Probe(agentCmd string, opts ProbeOptions) ProbeResult {
 
 	// SessionCapabilities must match the wire field name exactly.
 	type capsAlias struct {
-		LoadSession         bool                     `json:"loadSession"`
-		PromptCapabilities  map[string]any           `json:"promptCapabilities"`
-		McpCapabilities     map[string]any           `json:"mcpCapabilities"`
+		LoadSession         bool                       `json:"loadSession"`
+		PromptCapabilities  map[string]any             `json:"promptCapabilities"`
+		McpCapabilities     map[string]any             `json:"mcpCapabilities"`
 		SessionCapabilities map[string]json.RawMessage `json:"sessionCapabilities"`
 	}
 	var initFull struct {

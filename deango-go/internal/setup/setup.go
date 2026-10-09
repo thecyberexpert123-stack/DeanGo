@@ -72,7 +72,7 @@ var defs = map[string]stepDef{
 			return true
 		},
 		commands: map[string]string{"posix": "pip install 'agent-client-protocol==0.9.0'  # or: hermes pm repair acp"},
-		verify: &verifySpec{cmd: "hermes-acp", args: []string{"--version"}},
+		verify:   &verifySpec{cmd: "hermes-acp", args: []string{"--version"}},
 	},
 	"auth-hermes": {
 		label:       "Authenticate Hermes with a model provider (interactive)",

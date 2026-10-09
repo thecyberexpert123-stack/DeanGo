@@ -17,7 +17,7 @@ import (
 	"deango/internal/util"
 )
 
-func runDir(id string) string { return filepath.Join(util.DeangoHome(), "run", id) }
+func runDir(id string) string  { return filepath.Join(util.DeangoHome(), "run", id) }
 func pidPath(id string) string { return filepath.Join(runDir(id), "unit.pid") }
 func logPath(id string) string { return filepath.Join(runDir(id), "unit.log") }
 

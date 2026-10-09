@@ -15,11 +15,11 @@ import (
 )
 
 type opts struct {
-	launcherPath  string
-	hermesHome    string
+	launcherPath   string
+	hermesHome     string
 	hermesCheckout string
-	hermesBin     string
-	openclawBin   string
+	hermesBin      string
+	openclawBin    string
 }
 
 func gather(det model.DetectionReport) opts {
@@ -81,12 +81,12 @@ func acpxSnippet(o opts) map[string]any {
 				"env":     map[string]string{"HERMES_HOME": home},
 			},
 		},
-		"probeAgent":              "hermes",
-		"permissionMode":          "approve-reads",
+		"probeAgent":                "hermes",
+		"permissionMode":            "approve-reads",
 		"nonInteractivePermissions": "deny",
-		"openClawToolsMcpBridge":  true,
-		"pluginToolsMcpBridge":    true,
-		"timeoutSeconds":          120,
+		"openClawToolsMcpBridge":    true,
+		"pluginToolsMcpBridge":      true,
+		"timeoutSeconds":            120,
 		"nativeAgents": map[string]any{
 			"opencode": false, "qwen": false, "pi": false, "kilocode": false, "copilot": false,
 		},
@@ -229,11 +229,11 @@ func BuildConnection(det model.DetectionReport, apply bool) (model.BuildResult, 
 	}
 
 	manifest := map[string]any{
-		"builtAt":  time.Now().UTC().Format(time.RFC3339),
-		"apply":    apply,
-		"written":  res.Written,
-		"merges":   res.Merges,
-		"core":     "go",
+		"builtAt": time.Now().UTC().Format(time.RFC3339),
+		"apply":   apply,
+		"written": res.Written,
+		"merges":  res.Merges,
+		"core":    "go",
 	}
 	if err := util.WriteJSONFile(filepath.Join(util.DeangoHome(), "connection", "manifest.json"), manifest); err != nil {
 		return res, err

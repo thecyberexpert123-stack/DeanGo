@@ -26,41 +26,41 @@ type NpmInfo struct {
 }
 
 type NodeReport struct {
-	Installed bool     `json:"installed"`
-	Bin       string   `json:"bin,omitempty"`
-	Version   string   `json:"version,omitempty"`
-	Npm       NpmInfo  `json:"npm"`
+	Installed bool    `json:"installed"`
+	Bin       string  `json:"bin,omitempty"`
+	Version   string  `json:"version,omitempty"`
+	Npm       NpmInfo `json:"npm"`
 }
 
 type HermesReport struct {
-	Installed    bool     `json:"installed"`
-	Bins         []Bin    `json:"bins"`
-	Version      string   `json:"version,omitempty"`
-	Home         string   `json:"home,omitempty"`
-	Checkout     string   `json:"checkout,omitempty"`
-	ConfigFiles  []string `json:"configFiles"`
-	AcpHint      string   `json:"acpHint"`
-	Pip          string   `json:"pip,omitempty"`
+	Installed   bool     `json:"installed"`
+	Bins        []Bin    `json:"bins"`
+	Version     string   `json:"version,omitempty"`
+	Home        string   `json:"home,omitempty"`
+	Checkout    string   `json:"checkout,omitempty"`
+	ConfigFiles []string `json:"configFiles"`
+	AcpHint     string   `json:"acpHint"`
+	Pip         string   `json:"pip,omitempty"`
 }
 
 type OpenclawReport struct {
-	Installed    bool     `json:"installed"`
-	Bins         []Bin    `json:"bins"`
-	Version      string   `json:"version,omitempty"`
-	Home         string   `json:"home,omitempty"`
-	NpmGlobal    string   `json:"npmGlobal,omitempty"`
-	Checkout     string   `json:"checkout,omitempty"`
-	ConfigFiles  []string `json:"configFiles"`
+	Installed   bool     `json:"installed"`
+	Bins        []Bin    `json:"bins"`
+	Version     string   `json:"version,omitempty"`
+	Home        string   `json:"home,omitempty"`
+	NpmGlobal   string   `json:"npmGlobal,omitempty"`
+	Checkout    string   `json:"checkout,omitempty"`
+	ConfigFiles []string `json:"configFiles"`
 }
 
 // DetectionReport is the machine scan result (mirrors the Node engine).
 type DetectionReport struct {
-	ScannedAt string          `json:"scannedAt"`
-	System    SystemReport    `json:"system"`
-	Node      NodeReport      `json:"node"`
-	Hermes    HermesReport    `json:"hermes"`
-	Openclaw  OpenclawReport  `json:"openclaw"`
-	Complete  bool            `json:"complete"`
+	ScannedAt string         `json:"scannedAt"`
+	System    SystemReport   `json:"system"`
+	Node      NodeReport     `json:"node"`
+	Hermes    HermesReport   `json:"hermes"`
+	Openclaw  OpenclawReport `json:"openclaw"`
+	Complete  bool           `json:"complete"`
 }
 
 // PlanFile is one connection artifact DeanGo renders.
