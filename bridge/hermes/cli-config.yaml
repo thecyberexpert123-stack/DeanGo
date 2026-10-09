@@ -1,0 +1,38 @@
+# Hermes side of the bridge — merge into ~/.hermes/cli-config.yaml.
+# Principle: the brain keeps ALL of its cognition; world-contact is delegated
+# to OpenClaw hands wherever the acpx MCP bridges reach.
+
+# --- the brain ---------------------------------------------------------------
+# Default model the body wakes up with (acpx's ACP session/set_model can
+# override per session from the OpenClaw side).
+# model: nous/hermes-4-405b
+
+# --- cognition stays on (this is WHY hermes is the brain) ---------------------
+memory:
+  enabled: true                 # agent-curated memory + periodic nudges
+skills:
+  auto_improve: true            # the closed learning loop keeps learning
+session_search:                 # FTS5 + LLM summaries across the body's past
+  enabled: true
+
+# --- approvals: hands ask, brain decides, human vetoes -----------------------
+# Under ACP, approval prompts are relayed to the OpenClaw host as
+# session/request_permission calls; unattended channels get the safe policy.
+approval_mode: smart            # guardian-LLM review for fuzzy cases
+# yolo: false                   # never. the hands are powerful.
+
+# --- what the brain may reach directly (its own body) -------------------------
+# Hermes' own file/terminal tools still exist for workspace-local work — the
+# body's reflexes. Anything that touches a *surface* (channels, devices,
+# browser, canvas) should arrive through an OpenClaw MCP bridge tool instead.
+toolsets:
+  enabled:
+    - core
+  # mcp:
+  #   servers:
+  #     openclaw-hands:          # if you run the reverse bridge (see README §7)
+  #       command: python3 bridge/mcp/openclaw_hands_mcp.py
+
+# --- quiet the body ----------------------------------------------------------
+# ACP owns stdio; banners, TUIs and spinners must never compete with the cord.
+quiet_mode: true

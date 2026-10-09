@@ -1,0 +1,36 @@
+{
+  "//": [
+    "OpenClaw × Hermes bridge — acpx plugin configuration.",
+    "Merge this into your OpenClaw configuration under the `acpx` plugin section",
+    "(see extensions/acpx/openclaw.plugin.json for the authoritative schema).",
+    "What each piece does is annotated in bridge/README.md §5."
+  ],
+
+  "agents": {
+    "hermes": {
+      "command": "bridge/bin/hermes-acp-launcher.sh",
+      "args": [],
+      "env": {
+        "HERMES_HOME": "~/.hermes"
+      }
+    }
+  },
+
+  "probeAgent": "hermes",
+
+  "permissionMode": "approve-reads",
+  "nonInteractivePermissions": "deny",
+
+  "openClawToolsMcpBridge": true,
+  "pluginToolsMcpBridge": true,
+
+  "timeoutSeconds": 120,
+
+  "nativeAgents": {
+    "opencode": false,
+    "qwen": false,
+    "pi": false,
+    "kilocode": false,
+    "copilot": false
+  }
+}
