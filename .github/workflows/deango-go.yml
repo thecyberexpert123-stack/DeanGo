@@ -21,8 +21,9 @@ jobs:
       - name: gofmt check
         working-directory: deango-go
         run: |
-          if [ -n "$(gofmt -l .)" ]; then
-            echo "::error::gofmt issues in:"; gofmt -l .; exit 1
+          gofmt -d . | tee /tmp/gofmt.diff
+          if [ -s /tmp/gofmt.diff ]; then
+            echo "::error::gofmt issues (see diff above)"; exit 1
           fi
 
       - name: go vet
