@@ -15,12 +15,8 @@
  *   deango gui [--port 7788]      web console (default command)
  *   deango doctor                 detect → inspect → connect(plan) → report
  */
-import { detectAll } from "../src/detect.mjs";
-import { inspectAll } from "../src/inspect.mjs";
-import { planConnection, buildConnection } from "../src/connect.mjs";
-import { planSetup, runStep } from "../src/setup.mjs";
-import { listUnits, startUnit, stopUnit, statusUnit, tailLog } from "../src/supervisor.mjs";
-import { probeAcp } from "../src/acp.mjs";
+import { detectAll, inspectAll, planConnection, buildConnection, planSetup, runStep,
+         listUnits, startUnit, stopUnit, tailLog, probeAcp, coreInfo } from "../src/gocore.mjs";
 import { startGui } from "../src/gui.mjs";
 import { log } from "../src/util.mjs";
 
@@ -32,6 +28,8 @@ const out = (obj) => console.log(JSON.stringify(obj, null, 2));
 
 async function main() {
   switch (cmd) {
+    case "core":
+      out(await coreInfo()); break;
     case "detect":
       out(await detectAll()); break;
     case "inspect": {
@@ -67,7 +65,7 @@ async function main() {
       break;
     }
     case "status": out(await listUnits()); break;
-    case "logs": console.log(tailLog(args[1] || "openclaw-gateway", Number(args[2] || 200))); break;
+    case "logs": console.log(await tailLog(args[1] || "openclaw-gateway", Number(args[2] || 200))); break;
     case "probe": {
       const r = await probeAcp(opt("--cmd", "hermes acp"), {
         prompt: opt("--prompt", null),

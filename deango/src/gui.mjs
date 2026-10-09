@@ -6,12 +6,8 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { detectAll } from "./detect.mjs";
-import { inspectAll } from "./inspect.mjs";
-import { planConnection, buildConnection } from "./connect.mjs";
-import { planSetup, runStep } from "./setup.mjs";
-import { listUnits, startUnit, stopUnit, tailLog } from "./supervisor.mjs";
-import { probeAcp } from "./acp.mjs";
+import { detectAll, inspectAll, planConnection, buildConnection, planSetup, runStep,
+         listUnits, startUnit, stopUnit, tailLog, probeAcp, coreInfo } from "./gocore.mjs";
 import { readJson, DEANGO_HOME, log } from "./util.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,10 +23,12 @@ async function fullScan() {
 }
 
 const routes = {
+  "GET /api/core": async () => await coreInfo(),
   "GET /api/status": async () => {
     const units = await listUnits().catch(() => []);
     const manifest = await readJson(path.join(DEANGO_HOME, "connection", "manifest.json"));
-    return { det: cache.det, complete: !!cache.det?.complete, units, manifest, deangoHome: DEANGO_HOME };
+    const engine = await coreInfo().catch(() => ({ mode: "unknown" }));
+    return { det: cache.det, complete: !!cache.det?.complete, units, manifest, deangoHome: DEANGO_HOME, engine };
   },
   "POST /api/scan": async () => await fullScan(),
   "GET /api/report": async () => (cache.det ? cache : await fullScan()),

@@ -22,13 +22,21 @@ DeanGo is the missing ops layer that stands that organism up and keeps it standi
 ## Quickstart
 
 ```bash
-cd deango
-node bin/deango.mjs gui          # or: npm start
-# open http://localhost:7788
+# 1) build the engine (Go, stdlib-only — one static binary)
+cd deango-go && go build -o deango ./cmd/deango && cd ..
+
+# 2) launch the console (Node, zero npm installs)
+cd deango && node bin/deango.mjs gui
+# open http://localhost:7788 — the engine badge shows "go"
 ```
 
-No `npm install` step — DeanGo is pure Node stdlib (Node ≥ 18), so it runs offline
-and can bootstrap a machine that has nothing yet.
+**Two engines, one console.** The **Go core** (`deango-go/`) is the engine: detect,
+inspect, connect, setup, supervisor, ACP probe — one static binary, stdlib-only.
+The **Node app** (`deango/`) is the UI/glue: the web console and CLI drive the Go
+binary automatically (override with `DEANGO_CORE_BIN`). If the Go binary is absent,
+the console transparently falls back to its built-in Node implementation of the
+same engine — every JSON shape is identical either way. The Node app itself needs
+no `npm install` (pure stdlib, Node ≥ 18), so DeanGo can bootstrap a bare machine.
 
 ## The organism DeanGo operates
 
