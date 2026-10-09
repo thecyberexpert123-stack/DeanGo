@@ -1,0 +1,17 @@
+{
+  "name": "deango",
+  "version": "0.1.0",
+  "description": "DeanGo — operator console for the Hermes-brain + OpenClaw-limbs organism. Not an agent: it detects, inspects, connects, supervises, and probes the two bodies.",
+  "type": "module",
+  "bin": { "deango": "bin/deango.mjs" },
+  "scripts": {
+    "start": "node bin/deango.mjs gui",
+    "detect": "node bin/deango.mjs detect",
+    "inspect": "node bin/deango.mjs inspect",
+    "connect": "node bin/deango.mjs connect",
+    "doctor": "node bin/deango.mjs doctor"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {},
+  "license": "MIT"
+}

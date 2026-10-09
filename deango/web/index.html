@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DeanGo — Organism Console</title>
+<style>
+:root{--bg:#0b0f14;--card:#121922;--line:#1f2a37;--txt:#dbe4ee;--dim:#7e8fa3;--accent:#ff6b4a;--ok:#3ddc84;--warn:#ffcf5c;--bad:#ff5c7a;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,sans-serif}
+header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+h1{font-size:20px;margin:0}.badge{font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid var(--line)}
+.badge.ok{color:var(--ok);border-color:var(--ok)}.badge.warn{color:var(--warn);border-color:var(--warn)}
+nav{display:flex;gap:4px;padding:0 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav button{background:none;border:none;color:var(--dim);padding:12px 14px;cursor:pointer;font-size:14px;border-bottom:2px solid transparent}
+nav button.on{color:var(--txt);border-color:var(--accent)}
+main{padding:20px 24px;max-width:1200px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{margin:0 0 10px;font-size:15px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:4px 10px;font-size:13px}
+.kv b{color:var(--dim);font-weight:500}.mono{font-family:var(--mono);font-size:12px}
+pre{background:#0a0e13;border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto;max-height:420px;font-family:var(--mono);font-size:12px}
+button.act{background:var(--accent);color:#140a06;border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+button.ghost{background:none;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+.dot{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:6px}
+.dot.g{background:var(--ok)}.dot.r{background:var(--bad)}.dot.y{background:var(--warn)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}
+input[type=text]{background:#0a0e13;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;width:100%;font-family:var(--mono);font-size:12px}
+.org{text-align:center;font-family:var(--mono);font-size:11px;color:var(--dim);white-space:pre;line-height:1.15;overflow:auto;padding:6px}
+.flash{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;max-width:380px;font-size:13px;opacity:0;transition:opacity .25s}
+.flash.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧠⚡🦞 DeanGo <span style="color:var(--dim);font-weight:400">organism console</span></h1>
+  <span id="orgBadge" class="badge warn">scanning…</span>
+  <span style="flex:1"></span>
+  <button class="ghost" onclick="rescan()">↺ Rescan</button>
+</header>
+<nav id="tabs"></nav>
+<main id="view">…</main>
+<div id="flash" class="flash"></div>
+<script>
+const S={det:null,insp:null,units:[],tab:"Overview",manifest:null};
+const TABS=["Overview","Detection","Inspection","Connection","Units","Probe","Setup"];
+const flash=(m)=>{const f=document.getElementById("flash");f.textContent=m;f.classList.add("show");setTimeout(()=>f.classList.remove("show"),3500)};
+const j=(p,o={})=>fetch("/api/"+p,{method:o.m||(o.b?"POST":"GET"),headers:{"content-type":"application/json"},body:o.b?JSON.stringify(o.b):undefined}).then(r=>r.json());
+const esc=(s)=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function tabs(){document.getElementById("tabs").innerHTML=TABS.map(t=>`<button class="${t===S.tab?"on":""}" onclick="S.tab='${t}';render()">${t}</button>`).join("")}
+async function refresh(){const st=await j("status");S.det=st.det;S.units=st.units||[];S.manifest=st.manifest;
+  const ready=st.complete&&S.units.some(u=>u.id==="openclaw-gateway"&&u.status?.running);
+  const b=document.getElementById("orgBadge");
+  if(ready){b.textContent="ORGANISM ALIVE";b.className="badge ok"}
+  else if(st.complete){b.textContent="bodies found · ready to connect";b.className="badge warn"}
+  else{b.textContent="bodies missing";b.className="badge warn"}
+  render()}
+
+const ORG=`
+        legs: whatsapp telegram slack discord signal imessage teams matrix zalo sms voice …
+                                │  ▲
+        nerves: OpenClaw gateway│  │sessions/approvals/delivery
+                        ACP stdio│  │session/update
+                                ▼  │
+        brain: Hermes acp_adapter → conversation_loop (turn_*.py)
+        body : hermes_state_* (WAL+FTS5) · memory · 212 skills · SOUL.md
+                                │  ▲
+        hands: acpx MCP bridges ▼  │ openClawToolsMcpBridge · pluginToolsMcpBridge
+`;
+
+function vOverview(){const d=S.det||{};const unit=(id)=>S.units.find(u=>u.id===id);
+ return `<div class="card"><h3>The organism</h3><div class="org">${esc(ORG)}</div></div>
+ <div class="grid" style="margin-top:14px">
+  <div class="card"><h3><span class="dot ${d.hermes?.installed?"g":"r"}"></span>Hermes — brain+body</h3><div class="kv">
+   <b>installed</b><span>${!!d.hermes?.installed}</span><b>version</b><span class="mono">${esc(d.hermes?.version||"—")}</span>
+   <b>home</b><span class="mono">${esc(d.hermes?.home||"—")}</span><b>checkout</b><span class="mono">${esc(d.hermes?.checkout||"—")}</span>
+   <b>bins</b><span class="mono">${esc((d.hermes?.bins||[]).map(b=>b.name).join(", ")||"—")}</span></div></div>
+  <div class="card"><h3><span class="dot ${d.openclaw?.installed?"g":"r"}"></span>OpenClaw — limbs</h3><div class="kv">
+   <b>installed</b><span>${!!d.openclaw?.installed}</span><b>version</b><span class="mono">${esc(d.openclaw?.version||"—")}</span>
+   <b>home</b><span class="mono">${esc(d.openclaw?.home||"—")}</span><b>npm global</b><span class="mono">${esc(d.openclaw?.npmGlobal||"—")}</span></div></div>
+  <div class="card"><h3><span class="dot ${unit("openclaw-gateway")?.status?.running?"g":"y"}"></span>Processes</h3>
+   ${S.units.map(u=>`<div class="row"><span class="dot ${u.status?.running?"g":"r"}"></span><span style="flex:1">${esc(u.label||u.id)}</span>
+    <button class="ghost" onclick="unitAct('start','${u.id}')">start</button><button class="ghost" onclick="unitAct('stop','${u.id}')">stop</button></div>`).join("")||"<i>no units yet — build connection</i>"}
+   <div class="row" style="margin-top:10px"><button class="act" onclick="build(false)">⚙ Build connection</button>
+   <button class="ghost" onclick="build(true)">Apply to live configs</button></div></div>
+ </div>`}
+function vDetection(){return `<pre>${esc(JSON.stringify(S.det,null,2))}</pre>`}
+function vInspection(){return `<div class="row"><button class="ghost" onclick="rescan()">↺ refresh</button></div><pre id="insp">loading…</pre>`}
+function vConnection(){return `<div class="row"><button class="act" onclick="connPlan()">render plan</button>
+ <button class="ghost" onclick="build(false)">write to ~/.deango</button>
+ <button class="ghost" onclick="build(true)">write + merge live configs</button></div>
+ <p style="color:var(--dim)">DeanGo renders connection files into <span class="mono">~/.deango</span>. “Merge” deep-merges the acpx snippet into the OpenClaw JSON config (timestamped backup) and upserts a managed block into Hermes' cli-config.yaml.</p>
+ <pre id="conn">press a button…</pre>`}
+function vUnits(){return S.units.map(u=>`<div class="card" style="margin-bottom:12px"><h3><span class="dot ${u.status?.running?"g":"r"}"></span>${esc(u.label||u.id)} ${u.status?.pid?"· pid "+u.status.pid:""}</h3>
+ <div class="row"><button class="ghost" onclick="unitAct('start','${u.id}')">start</button>
+ <button class="ghost" onclick="unitAct('stop','${u.id}')">stop</button>
+ <button class="ghost" onclick="loadLog('${u.id}')">tail log</button></div>
+ <pre id="log-${u.id}"></pre></div>`).join("")||"<div class='card'>No units — build the connection first.</div>"}
+function vProbe(){return `<div class="card"><h3>Live ACP probe — feel the spine</h3>
+ <div class="kv"><b>agent cmd</b><span><input id="pcmd" type="text" value="hermes acp"></span>
+ <b>prompt</b><span><input id="pprompt" type="text" placeholder='e.g. Reply with exactly: the body is online.'></span></div>
+ <div class="row"><label><input type="checkbox" id="plist"> list sessions</label>
+ <label><input type="checkbox" id="pallow"> allow-once permissions</label></div>
+ <div class="row"><button class="act" onclick="runProbe()">⚡ probe</button></div>
+ <pre id="pout">…</pre></div>`}
+function vSetup(){return `<div class="row"><button class="act" onclick="setupPlan()">plan setup</button></div>
+ <p style="color:var(--dim)">Missing bodies? DeanGo drafts the official install commands. Nothing runs until you click run."</p><pre id="setout">…</pre>`}
+const VIEWS={Overview:vOverview,Detection:vDetection,Inspection:vInspection,Connection:vConnection,Units:vUnits,Probe:vProbe,Setup:vSetup};
+
+async function render(){tabs();document.getElementById("view").innerHTML=VIEWS[S.tab]();
+ if(S.tab==="Inspection"){const r=await j("report");document.getElementById("insp").textContent=JSON.stringify(r.insp,null,2)}}
+async function rescan(){await j("scan",{b:{}});await refresh();flash("rescan complete")}
+async function connPlan(){const p=await j("connection/plan",{b:{}});document.getElementById("conn").textContent=JSON.stringify(p,null,2)}
+async function build(apply){const r=await j("connection/build",{b:{apply}});if(S.tab==="Connection")document.getElementById("conn").textContent=JSON.stringify(r,null,2);
+ flash(apply?`built + ${r.merges?.length||0} merge(s) applied`:`connection files written to ${S.det?.system?.deangoHome||"~/.deango"}`);await refresh()}
+async function unitAct(a,id){const r=await j("unit/"+a,{b:{id}});flash(JSON.stringify(r).slice(0,200));await refresh()}
+async function loadLog(id){const r=await j("unit/log?id="+id+"&lines=120");document.getElementById("log-"+id).textContent=r.log||"(empty)"}
+async function runProbe(){document.getElementById("pout").textContent="probing…";
+ const r=await j("acp/probe",{b:{cmd:document.getElementById("pcmd").value,prompt:document.getElementById("pprompt").value||null,
+ listSessions:document.getElementById("plist").checked,permissionPolicy:document.getElementById("pallow").checked?"allow-once":"deny"}});
+ document.getElementById("pout").textContent=JSON.stringify(r,null,2)}
+async function setupPlan(){const r=await j("setup/plan",{b:{}});
+ if(!r.steps.length){document.getElementById("setout").textContent="nothing to do — both bodies present ✔";return}
+ document.getElementById("setout").textContent=r.steps.map(s=>`# ${s.label}\n${s.command}`).join("\n\n")+
+  "\n\n# To execute a step:\n#   POST /api/setup/run {step:'<id>', confirm:true}   (interactive steps must be run in a terminal yourself)"}
+refresh().catch(e=>flash("initial scan failed: "+e));setInterval(()=>{if(S.tab==="Units")refresh()},4000);
+</script>
+</body>
+</html>
